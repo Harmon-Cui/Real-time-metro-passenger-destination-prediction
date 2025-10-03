@@ -1,0 +1,9 @@
+event_id,event_time,passenger_id,origin_station_id,dest_pred,decision_path
+E0001,2018-04-30T08:05:00,P1001,102,215,match_unique
+E0002,2018-04-30T08:18:00,P1001,102,215,match_unique
+E0003,2018-04-30T10:12:00,P1001,102,102,match_unique
+E0004,2018-04-30T14:35:00,P2001,102,215,match_mc
+E0005,2018-04-30T18:10:00,P3001,102,102,clf_fallback
+E0006,2018-04-30T19:22:00,P2001,102,215,clf_fallback
+E0007,2018-04-30T11:40:00,P4001,102,198,clf_fallback
+E0008,2018-04-30T17:15:00,P5001,102,198,clf_fallback
