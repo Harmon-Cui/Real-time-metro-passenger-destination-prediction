@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/1069326174.svg)](https://doi.org/10.5281/zenodo.17263980)
 # Real-Time Metro Destination Prediction (Demo)
 
 This repository provides a demonstration of the **real-time individual-level destination prediction workflow**:  
