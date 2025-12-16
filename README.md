@@ -28,6 +28,15 @@ representative offline modules and documentation are included under
   documentation of the input data structure, feature construction, clustering
   logic, and outputs is provided.
 
+- **Hierarchical passenger clustering and segmentation**  
+  (`offline_modules/hierarchical_clustering/`):  
+  Workflow-level documentation describing the offline hierarchical clustering
+  procedure used to derive passenger categories, including pre-classification,
+  second-order clustering of active passengers (implemented using SPSS), and
+  fine-grained segmentation guided by fuzzy clustering principles. This module
+  explains the analytical logic and interpretation of clustering results,
+  without providing executable clustering algorithms.
+
 - **Station geocoding using Amap**  
   (`offline_modules/geocoding_amap/`):  
   Station-level longitude and latitude acquisition via the Amap (Gaode) Open
@@ -46,6 +55,7 @@ original AFC records and raw external datasets are not publicly released.
 Instead, transparent documentation of data structures, processing logic,
 and normalization procedures is provided to enable reproducibility using
 compatible datasets.
+
 
 
 ## Dependencies
