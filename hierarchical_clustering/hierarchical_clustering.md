@@ -1,116 +1,131 @@
 # Hierarchical Passenger Clustering and Segmentation
 
-This document describes the **offline hierarchical passenger clustering and segmentation workflow** used in this study.  
-The purpose of this documentation is to clarify the analytical logic and data processing steps underlying passenger categorization, thereby supporting the interpretability and reproducibility of the proposed framework.  
-This module provides **methodological documentation only** and does not represent a standalone algorithmic implementation.
+This document describes the **offline hierarchical passenger clustering workflow**
+corresponding to Section 2.2 of the paper.
+The purpose of this documentation is to clarify the analytical logic and processing stages
+used to derive passenger categories, thereby supporting transparency and reproducibility
+of the proposed framework.
+
+This module provides **methodological and workflow-level documentation only** and does
+not represent an executable clustering algorithm.
 
 ---
 
-## 1. Purpose
+## 1. Overview
 
-Passenger travel behavior in urban rail transit systems exhibits substantial heterogeneity, particularly among non-commuting and irregular users.  
-To capture this heterogeneity in a structured and interpretable manner, a **multi-stage (hierarchical) clustering strategy** was adopted to segment active passengers into behaviorally meaningful groups.
+The hierarchical clustering framework integrates **pre-classification, coarse clustering,
+and fine-grained segmentation** to progressively refine individual passenger groups.
+The overall objective is to distinguish deterministic (commuting) passengers from
+non-commuting passengers and further characterize heterogeneous preference-driven
+travel behaviors.
 
-The objectives of this clustering process are to:
-
-- Distinguish **deterministic (commuting) passengers** from non-commuting passengers;
-- Further characterize **flexible and irregular travel patterns**;
-- Identify **preference-oriented passenger groups** to support downstream personalized destination prediction.
-
-All clustering procedures are conducted as **offline statistical analyses** and serve as inputs to the subsequent prediction framework.
+All clustering and segmentation steps are conducted as **offline analytical procedures**
+and provide behavioral labels for downstream real-time destination prediction models.
 
 ---
 
-## 2. Input Features
+## 2. Pre-classification of Passengers
 
-The hierarchical clustering process is based on a set of **numerical behavioral indicators** derived from AFC data, together with selected contextual attributes.  
+Passengers are first divided according to ticket type into:
+
+- **Card-holding passengers**, with identifiable passenger IDs;
+- **Non-card-holding passengers**, without persistent IDs.
+
+Among card-holding passengers, historical travel frequency is evaluated using the global
+threshold `MinPts` (defined in Section 2.1.1 of the paper):
+
+- Passengers with travel frequency below `MinPts` are labeled as **inactive passengers**,
+  for whom meaningful spatiotemporal features cannot be reliably extracted.
+- The remaining passengers are considered **active passengers** and are used in the
+  hierarchical clustering process.
+
+---
+
+## 3. Second-Order Clustering of Active Passengers (SPSS-based)
+
+### 3.1 Input Features
+
+Second-order clustering is performed using a combination of:
+
+- Spatiotemporal travel features derived from AFC data, including:
+  - Travel randomness index ($NR_u$)
+  - Travel periodicity
+  - Travel intensity and stability indicators
+- Preference-related contextual attributes, such as station functional types
+
 All numerical features are normalized prior to analysis.
 
-### 2.1 Spatiotemporal Travel Features
+---
 
-The following indicators are used to characterize passenger travel regularity and intensity:
+### 3.2 Coarse Classification
 
-- Average OD trip count  
-- Travel randomness index ($NR_u$)  
-- Variance of travel randomness  
-- Travel periodicity  
-- Distance fluctuation coefficient  
-- Number of distinct spatiotemporal travel patterns
+The second-order clustering of active passengers is implemented using **SPSS**
+as an offline statistical analysis tool.
 
-These features jointly describe the stability, frequency, and temporal structure of individual travel behavior.
+Active passengers are grouped based on their spatiotemporal regularity:
 
-### 2.2 Contextual and Preference-Related Features
+- Passengers with low values of $NR_u$ and highly regular patterns are classified as
+  **deterministic passengers**, corresponding to commuting travelers.
+- All remaining active passengers are categorized as **non-commuting passengers**,
+  including both partially regular and highly irregular travelers.
 
-For preference-oriented segmentation, additional indicators are incorporated, including:
+Cluster quality is evaluated using silhouette-based measures provided by SPSS to ensure
+reasonable separation and robustness of the resulting groups.
 
-- Station functional type attributes  
-- Aggregated economic attributes associated with passenger activity areas  
-  (e.g., living expenditure and consumption expenditure)
-
-These attributes are used to support preference interpretation rather than strict rule-based classification.
+This definition is consistent with the conventional commuting versus non-commuting
+dichotomy in the literature, while explicitly focusing subsequent modeling on the
+more heterogeneous non-commuting group.
 
 ---
 
-## 3. Clustering Logic
+## 4. Fine-Grained Segmentation Based on Fuzzy Clustering Principles
 
-### 3.1 First-Stage Clustering: Identification of Deterministic Passengers
+For non-commuting passengers whose behavioral patterns remain difficult to characterize
+after second-order clustering, a **fine-grained segmentation step** is applied.
 
-In the first stage, a statistical clustering analysis is applied to all **active passengers** using the spatiotemporal travel features listed above.
+In this study, **Fuzzy C-Means (FCM)** is introduced at the **methodological level**
+to describe the clustering principle of allowing overlapping behavioral characteristics.
+Compared with hard clustering methods (e.g., K-means), this principle is suitable for
+urban rail transit passengers whose travel patterns often exhibit partial regularity
+and uncertainty.
 
-Passengers with **low travel randomness ($NR_u$)** and strong periodic patterns are identified as **deterministic (commuting) passengers**, while the remaining passengers are categorized as non-commuting users.  
-Cluster quality is evaluated using silhouette-based measures to ensure reasonable separation.
+At the implementation level, this step is conducted as an **offline statistical grouping
+and post-analysis procedure**, guided by fuzzy clustering principles rather than by an
+explicit algorithmic realization of FCM.
 
----
-
-### 3.2 Second-Stage Clustering: Subclassification of Flexible Passengers
-
-Passengers exhibiting partial regularity (i.e., flexible travel behavior) are further clustered using an extended feature set that includes station-type indicators.
-
-This step distinguishes:
-
-- Commute-dominated flexible passengers  
-- Non-commuting flexible passengers
-
-The objective is to refine behavioral distinctions while maintaining interpretability for downstream modeling.
+Cluster numbers are determined through cluster validity analysis (e.g., Davies–Bouldin
+Index, DBI), ensuring a data-driven and robust partition.
 
 ---
 
-### 3.3 Preference-Oriented Segmentation (Fuzzy Clustering Principle)
+## 5. Output and Interpretation
 
-For passengers who remain difficult to characterize after the second stage—particularly those exhibiting high randomness and overlapping behavioral traits—a **fuzzy clustering–based statistical segmentation principle** is adopted.
+The hierarchical clustering process yields **discrete passenger categories**, which are
+summarized using class-wise statistical aggregation, including:
 
-In this study, the term *fuzzy clustering* is used to describe the **conceptual principle** of capturing overlapping preferences and gradual behavioral differences, rather than to indicate an explicit algorithmic realization of fuzzy C-means (FCM).
+- Passenger counts and proportions;
+- Aggregated trip volumes;
+- Mean behavioral indicators within each category.
 
-This step is implemented as an **offline statistical grouping and post-analysis procedure**, focusing on the relative proximity of passengers across multiple behavioral and economic dimensions.
+Final passenger groups are **interpreted and labeled** according to dominant behavioral
+and consumption characteristics, such as shopping-preference, entertainment-preference,
+dining-preference, and no-significant-preference passengers.
 
----
-
-## 4. Output and Interpretation
-
-The output of the hierarchical clustering process consists of **discrete passenger categories**, which are subsequently summarized using class-wise statistical aggregation.
-
-Key characteristics include:
-
-- Passenger counts and proportions per category  
-- Aggregated trip volumes  
-- Mean behavioral indicators within each group
-
-The final passenger categories are **interpreted and labeled** based on dominant behavioral and consumption patterns, such as:
-
-- Shopping-preference travel passengers  
-- Entertainment-preference travel passengers  
-- Dining-preference travel passengers  
-- Passengers with no significant preference
-
-These labels are assigned through **post-analysis interpretation** rather than direct algorithmic outputs and are used as inputs for personalized destination prediction models.
+These labels are derived through **post-analysis interpretation** rather than direct
+algorithmic outputs and are used as inputs for personalized destination prediction
+and system-level OD aggregation.
 
 ---
 
-## 5. Implementation Notes
+## 6. Notes on Reproducibility
 
-- All clustering analyses are conducted **offline** using standard statistical analysis tools.  
-- This documentation is intended to clarify the analytical workflow and does not imply the availability of a standalone clustering algorithm.  
-- The resulting passenger categories correspond to those reported in the manuscript tables and figures.
+- Second-order clustering is implemented using **SPSS** as an offline statistical tool.
+- Fine-grained segmentation follows **fuzzy clustering principles** without relying on
+  a standalone FCM algorithmic implementation.
+- This documentation is intended to explain the analytical workflow and does not imply
+  the availability of executable clustering code.
+- The resulting passenger categories correspond to those reported in the manuscript
+  tables and figures.
 
-For details on downstream modeling and prediction, please refer to the main paper and the accompanying code modules.
-
+For further details on feature extraction and downstream modeling, please refer to
+the accompanying code modules and the main paper.
