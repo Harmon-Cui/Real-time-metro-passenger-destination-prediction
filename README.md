@@ -11,6 +11,43 @@ The dataset is fully synthetic, designed to illustrate the inference logic witho
 - `predict.py` — Prediction script (with RF / NB fallback)  
 - `README.md` — Documentation
 
+## Reproducibility and Resources
+
+This repository supports **methodological reproducibility** of the proposed
+framework without requiring the release of proprietary or platform-restricted
+data.
+
+In addition to the online prediction demo provided in the root directory,
+representative offline modules and documentation are included under
+`offline_modules/`, covering key stages of the proposed framework:
+
+- **AFC preprocessing and spatiotemporal feature extraction**  
+  (`offline_modules/afc_dbscan/`):  
+  DBSCAN-based extraction of individual spatiotemporal travel profiles from
+  AFC transaction records stored in a relational database (MySQL). Detailed
+  documentation of the input data structure, feature construction, clustering
+  logic, and outputs is provided.
+
+- **Station geocoding using Amap**  
+  (`offline_modules/geocoding_amap/`):  
+  Station-level longitude and latitude acquisition via the Amap (Gaode) Open
+  Platform, used for spatial matching, POI aggregation, and geo-economic
+  feature mapping.
+
+- **Normalization of POI and geo-economic features**  
+  (`offline_modules/external_normalization/`):  
+  Documentation of station-level aggregation and normalization procedures
+  applied to POI data and geo-economic indicators (e.g., housing prices and
+  consumption-related attributes), collected using third-party data collection
+  tools such as Octoparse.
+
+Due to data confidentiality agreements and platform usage policies, the
+original AFC records and raw external datasets are not publicly released.
+Instead, transparent documentation of data structures, processing logic,
+and normalization procedures is provided to enable reproducibility using
+compatible datasets.
+
+
 ## Dependencies
 
 - Python 3.8+  
